@@ -1,5 +1,6 @@
 <?php
     require_once "/home/mir/lib/db.php";
+    require "functions.php";
 ?>
 
 <!DOCTYPE html>
@@ -13,30 +14,24 @@
     <script src="https://kit.fontawesome.com/dc9e7905fa.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-  <!-- check if logged in -->
   <?php
     session_start();
-
-    if (empty($_SESSION['suser'] && $_SESSION['spw']))
-    {
-      echo "not logged in";
-      header('Location:login.php');
-      exit;
-    } 
-    ?>
+  ?>
 
 </head>
 
 <body>
     
+<!--Navigation bar-->
 <div class="topnav">
-    <a class="active" href="#home">Home</a>
-    <a href="submittedpost.php">Posts</a>
+    <a href="index.php">Posts</a>
     <a href="login.php">Login</a>
-    <a href="createuser.php">Register</a>
+    <a href="register.php">Register</a>
     <a href="users.php">Alle Brugere</a>
-    <a href="blogposts.php"><?php echo $_SESSION['suser'] ?></a>
-    
+    <a href="profile.php?uid=<?php echo $_SESSION['suser'] ?> " <?php checkIfLoggedInAndHideElement($_SESSION['suser'], $_SESSION['spw']); ?>><?php echo $_SESSION['suser'] ?></a>
+    <form action="" method="post" <?php checkIfLoggedInAndHideElement($_SESSION['suser'], $_SESSION['spw']); ?>>
+      <input type="submit" value="Log ud" name="logout">
+    </form>
 </div>
 
 <div class='user-feed'>
@@ -48,12 +43,14 @@
 <?php
     require_once "/home/mir/lib/db.php";
 
+    logOut();
+
     $uids = get_uids();
     foreach ($uids as $uid)
     {
       echo "
       <div class='user-row'> 
-      <a href=\"show_user.php?uid=$uid\">$uid</a>
+      <a href=\"profile.php?uid=$uid\">$uid</a>
       </div>";
     }
   ?>

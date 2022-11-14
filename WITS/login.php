@@ -1,3 +1,8 @@
+<?php
+    require_once "/home/mir/lib/db.php";
+    require "functions.php";
+?>
+
 <!doctype html>
   <html>
     <head>
@@ -7,12 +12,26 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
       </head>
+      <?php
+        session_start(); //altid start session i header
+      ?>
     </head>
     <body>
+<!--Navigation bar-->
+<div class="topnav">
+    <a href="index.php">Posts</a>
+    <a href="login.php">Login</a>
+    <a href="register.php">Register</a>
+    <a href="users.php">Alle Brugere</a>
+    <a href="profile.php?uid=<?php echo $_SESSION['suser'] ?> " <?php checkIfLoggedInAndHideElement($_SESSION['suser'], $_SESSION['spw']); ?>><?php echo $_SESSION['suser'] ?></a>
+    <form action="" method="post" <?php checkIfLoggedInAndHideElement($_SESSION['suser'], $_SESSION['spw']); ?>>
+      <input type="submit" value="Log ud" name="logout">
+    </form>
+</div>
 
   <div class="blogbox">
     <!-- Login form using post -->
-  <form action="login.php" method="post" class="login-form">
+  <form action="login.php" method="post" class="login-form" >
     <div class='login-row'> 
       <h1>Log på WITS</h1>
     <!-- username -->
@@ -28,18 +47,16 @@
     </div>
   </form>
     <div class="registerText">
-      <h2>Har du ikke en konto? <a href="createuser.php">Tilmeld dig</a></h2>
+      <h2>Har du ikke en konto? <a href="register.php">Tilmeld dig</a></h2>
     </div>
   </div>
 </body>
-  </html>
+</html>
 
 
 <?php 
 
-//note der er ingen session_destroy eller log ud
-
-require_once "/home/mir/lib/db.php";
+logOut();
 
 //funktion der gemmer input felterne; username og pw
 //disse variabler køres gennem login() som returner true eller false afhængigt om brugeren passer med den i databasen
@@ -56,13 +73,13 @@ require_once "/home/mir/lib/db.php";
         $_SESSION['suser'] = $username;
         $_SESSION['spw'] = $pw;
         echo "true redirect til secret page";
-        header('Location:main.php');
+        header('Location:index.php');
         exit;
         
       } else if (!login($username, $pw)) {
         echo "<div class='errorMsg'>
                 <h1>WRONG LOGIN FOOL - be kind and try again</h1>
-              </div>";
+        </div>";
     }
   }
   

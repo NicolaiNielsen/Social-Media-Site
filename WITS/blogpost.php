@@ -1,125 +1,70 @@
 <?php
     require_once "/home/mir/lib/db.php";
+    require "functions.php";
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WITS</title>
+    <title>Blogpost</title>
     <link rel='stylesheet' href='style.css'/>
     <script src="https://kit.fontawesome.com/dc9e7905fa.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/SSajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-  <!-- check if logged in -->
-  <?php
-    session_start();
-
-    if (empty($_SESSION['suser'] && $_SESSION['spw']))
-    {
-      echo "not logged in";
-      header('Location:login.php');
-      exit;
-    } 
-    ?>
-
+<?php
+  session_start(); //session start
+?>
 </head>
-
 <body>
-
+<!--Navigation bar-->
 <div class="topnav">
-    <a class="active" href="#home">Home</a>
-    <a href="submittedpost.php">Posts</a>
+    <a href="index.php">Posts</a>
     <a href="login.php">Login</a>
-    <a href="createuser.php">Register</a>
-    <a href="show_user.php?uid=<?php $_SESSION['suser'] ?>"><?php echo $_SESSION['suser'] ?></a>
+    <a href="register.php">Register</a>
+    <a href="users.php">Alle Brugere</a>
+    <a href="profile.php?uid=<?php echo $_SESSION['suser'] ?> " <?php checkIfLoggedInAndHideElement($_SESSION['suser'], $_SESSION['spw']); ?>><?php echo $_SESSION['suser'] ?></a>
+    <form action="" method="post" <?php checkIfLoggedInAndHideElement($_SESSION['suser'], $_SESSION['spw']); ?>>
+      <input type="submit" value="Log ud" name="logout">
+    </form>
 </div>
-
-
 <!-- show posts -->
 
 <?php
-    require_once "/home/mir/lib/db.php";
-
-    $pid = $_GET['pid'];
-    $post = get_post($pid);
-
-    function getComments($pid) {
-
-      $comments = get_cids_by_pid($pid);
-
-      foreach($comments as $comment) {
-        $currentcomment = get_comment($comment);
-        echo "<div class='post_comments'>
-        <p id='comment'>$currentcomment[content]. $currentcomment[cid]</p>
-        <form method='post'>
-        <label for='edit'></label>
-        <textarea id='edit' style='display: none' name='edit'>$currentcomment[content]
-        </textarea>
-        <input type='submit' name='delete' value='Delete'/>
-        </form>
-        <textarea id='edit' style='display: none' name='edit'>$currentcomment[content]
-        </textarea>
-        <p><a href=\"show_user.php?uid=$currentcomment[uid]\">$currentcomment[uid]</a></p> 
-        <input type='submit' name='delete' value='Delete'/>
-          <button onclick='myFunction()' style='display: inline-block' >Edit</button>
-          <button onclick='myFunction()' style='display: inline-block' >Cancel</button>
-          <button onclick='myFunction()' style='display: inline-block' >Submit</button>
-          <button onclick='myFunction()' style='display: inline-block' >Delete</button>
-        </div>";
-
-        echo $currentcomment['cid'];
-
-        if(isset($_POST['delete'])) {
-          delete_comment($currentcomment['cid']);
-          echo "<meta http-equiv='refresh' content='0'>"; // REFRESH SIDE
-          break;
-      }
-    }
-  }
-
-
-
-
-    function getPictures($pid) {
-
-    $imageid = get_iids_by_pid($pid);
-
-      foreach($imageid as $value) {
-        $image = get_image($value);
-        $imagepath = $image['path'];
-        echo "<div class='box box1'><img src=$imagepath alt=''></div>";
-    }
-    }
+        $pid = $_GET['pid'];
+        $post = get_post($pid);
 
     echo 
     "<div class='blogpost'>
       <div class='bloginfo'>
           <h3>$pid. $post[title]</a></h3>
-          <p contentEditable='true'>$post[content]</p>
-          <p>skrevet af <a href=\"show_user.php?uid=$post[uid]\">$post[uid]</a></p>
+          <p id='content'>$post[content]</p>
+          <form id='edit' style='display: none' method='post'>
+          <textarea name='editcontent'>$post[content]
+          </textarea>
+          <input type='submit' name='editbutton' value='edit'/>
+          </form>
+          <p>skrevet af <a href=\"profile.php?uid=$post[uid]\">$post[uid]</a></p>
           <p>$post[date]</p>
+          <button onclick=\"myFunction()\" $show>Rediger</button>
         </div>";
             getPictures($pid);
             getComments($pid); 
     "</div>";
 
-    if (isset($_POST['postcomment'])) {
+    if (isset($_POST['postcomment'])) { //edit post kommentar
       add_comment($_SESSION['suser'], $pid, $_POST["comment"]);
       echo "<meta http-equiv='refresh' content='0'>";
     }
 
-  if ($_SESSION['suser'] == $pid) {
-    
-  }
-  
+    if(array_key_exists('editbutton', $_POST)) { //edit button 
+      modify_post($pid, $post["title"], $_POST["editcontent"]);
+      echo "<meta http-equiv='refresh' content='0'>"; // REFRESH SIDE
+    }
   ?>
 
-<!-- Tilføj Kommentar -->
-
-<div class ='commentbox'>
+<!-- Tilføj Kommentar gemmes hvis ikke logget ind-->
+<div class ='commentbox' <?php checkIfLoggedInAndHideElement($_SESSION['suser'], $_SESSION['spw'])?>>
       <form method='post'>
         <label for='comment'></label>
         <input placeholder='Tilføj kommentar' type='text' name='comment' required>
@@ -127,20 +72,11 @@
             <input type='submit' class='button' name='postcomment'>
           </div>
       </form>
-</div>
-
-
-
-<button onclick="myFunction()">Click Me</button>
-
-<div id="myDIV">
-  This is my DIV element.
-</div>
+</div>  
 
 <script>
-
-function myFunction() {
-  var x = document.getElementById("comment");
+function myFunction() { //hvis vi trykker på rediger knappen, så viser vi textfelt ellers hide
+  var x = document.getElementById("content");
   var textarea = document.getElementById("edit");
   if (x.style.display === "none") {
     x.style.display = "block";
