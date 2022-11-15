@@ -45,12 +45,20 @@
           <input type='submit' name='editbutton' value='edit'/>
           </form>
           <p>skrevet af <a href=\"profile.php?uid=$post[uid]\">$post[uid]</a></p>
-          <p>$post[date]</p>
-          <button onclick=\"myFunction()\" $show>Rediger</button>
-        </div>";
+          <p>$post[date]</p>";
+          
+          if ($_SESSION['suser'] == $post['uid']) { //checker om det er din post, hvis din, så vis rediger knap, hvis ikke, så hide knap
+            echo "DIN POST";
+            echo "<button onclick=\"showTextArea()\">Rediger</button>";
+            } else {
+            echo "IKKE DIN POST";
+            echo "<button onclick=\"showTextArea()\" style='display:none'>Rediger</button>";
+            }
+          echo
+        "</div>";
             getPictures($pid);
             getComments($pid); 
-    "</div>";
+      "</div>";
 
     if (isset($_POST['postcomment'])) { //edit post kommentar
       add_comment($_SESSION['suser'], $pid, $_POST["comment"]);
@@ -75,15 +83,15 @@
 </div>  
 
 <script>
-function myFunction() { //hvis vi trykker på rediger knappen, så viser vi textfelt ellers hide
-  var x = document.getElementById("content");
+function showTextArea() { //hvis vi trykker på rediger knappen, så viser vi textfelt ellers hide
+  var curcontent = document.getElementById("content");
   var textarea = document.getElementById("edit");
-  if (x.style.display === "none") {
-    x.style.display = "block";
+  if (curcontent.style.display === "none") {
+    curcontent.style.display = "block";
     textarea.style.display = "none";
 
   } else {
-    x.style.display = "none";
+    curcontent.style.display = "none";
     textarea.style.display = "block";
   }
 }

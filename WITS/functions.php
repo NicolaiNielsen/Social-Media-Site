@@ -13,6 +13,7 @@ function checkIfLoggedInAndHideElement($suser, $spw) {
       }
 }
 
+
 //Logud funktion der ødelægger session + refresher siden
 function logOut() {
 if(isset($_POST["logout"])) {
@@ -110,19 +111,19 @@ function getComments($pid) {
 
             if ($currentcomment['uid'] == $_SESSION['suser']) { //hvis din kommentar, vis delete knappen
                 echo "DIN KOMMENTAR";
-            $show = "style='display:block'"; 
-            echo $show;
+                $show = "style='display:block'"; 
+                echo $show;
             
-            echo
-            "<div class='post_comments'>
-                <p id='comment'> $currentcomment[cid]. $currentcomment[content]</p>
-                <p id='author'><a href=\"profile.php?uid=$currentcomment[uid]\">$currentcomment[uid]</a></p>
-            </div>
-            <div>
-            <form method='post'>
-              <input type='submit' $show name='delete$count' value='Delete'/>
-            </form>
-            </div>";
+                echo
+                "<div class='post_comments'>
+                    <p id='comment'> $currentcomment[cid]. $currentcomment[content]</p>
+                    <p id='author'><a href=\"profile.php?uid=$currentcomment[uid]\">$currentcomment[uid]</a></p>
+                </div>
+                <div>
+                <form method='post'>
+                  <input type='submit' $show name='delete$count' value='Delete'/>
+                </form>
+                </div>";
 
         }   elseif  ($currentcomment['uid'] != $_SESSION['suser']) { //hvis ikke din kommentar, så gem delete knappen
             echo "IKKE DIN KOMMENTAR";
@@ -139,16 +140,16 @@ function getComments($pid) {
             </form>
             </div>";
         }
+      }
 
-            $currentButtonCount = "delete{$count}"; //reference til det generede knap navn, hvert loop og kommentar delete1, delete2, delete3..
+        $currentButtonCount = "delete{$count}"; //reference til det generede knap navn, hvert loop og kommentar delete1, delete2, delete3..
 
-            if(isset($_POST[$currentButtonCount])) { //hvis tryk på knap, slet kommentar
-                delete_comment($currentcomment['cid']);
-                echo "<meta http-equiv='refresh' content='0'>"; // REFRESH SIDE
-                break;
-            }
-            $count++;
+        if(isset($_POST[$currentButtonCount])) { //hvis tryk på knap, slet kommentar
+            delete_comment($currentcomment['cid']);
+            echo "<meta http-equiv='refresh' content='0'>"; // REFRESH SIDE
         }
+        
+        $count++;
     }
 }
 ?>
