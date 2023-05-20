@@ -6,3 +6,4 @@ The site is only accessable to students at Roskilde University, since it is host
 The website can be improved in a few ways, but due to time contraints werent implemented.
 - Add checks to see if comments still exists before deletion (tests with multi-user functionality)
 - Add cleaner solution to hide/show features available to logged-in users
+- Add responsive design
